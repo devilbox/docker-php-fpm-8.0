@@ -82,4 +82,4 @@ Open up your browser at http://127.0.0.1:8080
 
 **[MIT License](LICENSE)**
 
-Copyright (c) 2018 [cytopia](https://github.com/cytopia)
+Copyright (c) 2019 [cytopia](https://github.com/cytopia)
