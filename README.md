@@ -1,11 +1,12 @@
 # PHP-FPM 8.0
 
 [![Build Status](https://travis-ci.org/devilbox/docker-php-fpm-8.0.svg?branch=master)](https://travis-ci.org/devilbox/docker-php-fpm-8.0)
-![Tag](https://img.shields.io/github/tag/devilbox/docker-php-fpm-8.0.svg)
-[![Join the chat at https://gitter.im/devilbox/Lobby](https://badges.gitter.im/devilbox/Lobby.svg)](https://gitter.im/devilbox/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Tag](https://img.shields.io/github/tag/devilbox/docker-php-fpm-8.0.svg)](https://github.com/devilbox/docker-php-fpm-8.0/releases)
+[![Gitter](https://badges.gitter.im/devilbox/Lobby.svg)](https://gitter.im/devilbox/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Discourse](https://img.shields.io/discourse/https/devilbox.discourse.group/status.svg?colorB=%234CB697)](https://devilbox.discourse.group)
 [![](https://images.microbadger.com/badges/version/devilbox/php-fpm-8.0.svg)](https://microbadger.com/images/devilbox/php-fpm-8.0 "php-fpm-8.0")
 [![](https://images.microbadger.com/badges/image/devilbox/php-fpm-8.0.svg)](https://microbadger.com/images/devilbox/php-fpm-8.0 "php-fpm-8.0")
-[![](https://images.microbadger.com/badges/license/devilbox/php-fpm-8.0.svg)](https://microbadger.com/images/devilbox/php-fpm-8.0 "php-fpm-8.0")
+[![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
 This repository will provide you a fully functional PHP-FPM 8.0 Docker image built from [official sources](https://github.com/php/php-src) nightly. It provides the base for [Devilbox PHP-FPM Docker images](https://github.com/devilbox/docker-php-fpm).
 
