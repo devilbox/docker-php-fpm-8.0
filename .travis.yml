@@ -47,6 +47,8 @@ install:
 before_script:
   - make build
   - make test
+  - make update-readme
+  - git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
 
 
 ###

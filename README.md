@@ -10,11 +10,9 @@
 
 This repository will provide you a fully functional PHP-FPM 8.0 Docker image built from [official sources](https://github.com/php/php-src) nightly. It provides the base for [Devilbox PHP-FPM Docker images](https://github.com/devilbox/docker-php-fpm).
 
-
 | Docker Hub | Upstream Project |
 |------------|------------------|
 | <a href="https://hub.docker.com/r/devilbox/php-fpm-8.0"><img height="82px" src="http://dockeri.co/image/devilbox/php-fpm-8.0" /></a> | <a href="https://github.com/cytopia/devilbox" ><img height="82px" src="https://raw.githubusercontent.com/devilbox/artwork/master/submissions_banner/cytopia/01/png/banner_256_trans.png" /></a> |
-
 
 ## Similar Base Images
 
@@ -22,7 +20,6 @@ This repository will provide you a fully functional PHP-FPM 8.0 Docker image bui
 * [PHP-FPM 5.3](https://github.com/devilbox/docker-php-fpm-5.3)
 * [PHP-FPM 7.4](https://github.com/devilbox/docker-php-fpm-7.4)
 * [PHP-FPM](https://github.com/devilbox/docker-php-fpm) (all PHP versions)
-
 
 ## Build
 
@@ -37,7 +34,6 @@ make rebuild
 make test
 ```
 
-
 ## Usage
 
 Add the following `FROM` line into your Dockerfile:
@@ -46,6 +42,48 @@ Add the following `FROM` line into your Dockerfile:
 FROM devilbox/php-fpm-8.0:latest
 ```
 
+## Available Modules
+
+If you need a dockerized version of **PHP 8.0** or **PHP-FPM 8.0** which provides a vast amount of
+modules enabled by default visit: **[devilbox/docker-php-fpm](https://github.com/devilbox/docker-php-fpm)**
+
+<!-- modules -->
+| Module       | Built-in  |
+|--------------|-----------|
+| Core         | ✔         |
+| ctype        | ✔         |
+| curl         | ✔         |
+| date         | ✔         |
+| dom          | ✔         |
+| fileinfo     | ✔         |
+| filter       | ✔         |
+| ftp          | ✔         |
+| hash         | ✔         |
+| iconv        | ✔         |
+| json         | ✔         |
+| libxml       | ✔         |
+| mbstring     | ✔         |
+| mysqlnd      | ✔         |
+| openssl      | ✔         |
+| pcre         | ✔         |
+| PDO          | ✔         |
+| pdo_sqlite   | ✔         |
+| Phar         | ✔         |
+| posix        | ✔         |
+| readline     | ✔         |
+| Reflection   | ✔         |
+| session      | ✔         |
+| SimpleXML    | ✔         |
+| sodium       | ✔         |
+| SPL          | ✔         |
+| sqlite3      | ✔         |
+| standard     | ✔         |
+| tokenizer    | ✔         |
+| xml          | ✔         |
+| xmlreader    | ✔         |
+| xmlwriter    | ✔         |
+| zlib         | ✔         |
+<!-- /modules -->
 
 ## Example
 
@@ -77,7 +115,6 @@ docker run -d --rm --name devilbox-nginx-stable \
 #### 4. Open browser
 
 Open up your browser at http://127.0.0.1:8080
-
 
 ## License
 
