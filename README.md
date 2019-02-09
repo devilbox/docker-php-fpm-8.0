@@ -16,10 +16,54 @@ This repository will provide you a fully functional PHP-FPM 8.0 Docker image bui
 
 ## Similar Base Images
 
+Have a look at the following similar Devilbox base images for which no official versions exist yet:
+
 * [PHP-FPM 5.2](https://github.com/devilbox/docker-php-fpm-5.2)
 * [PHP-FPM 5.3](https://github.com/devilbox/docker-php-fpm-5.3)
 * [PHP-FPM 7.4](https://github.com/devilbox/docker-php-fpm-7.4)
-* [PHP-FPM](https://github.com/devilbox/docker-php-fpm) (all PHP versions)
+
+In case you are looking for development and production ready PHP-FPM images for all versions,
+which have a vast amount of modules enabled by default go here:
+
+* [PHP-FPM](https://github.com/devilbox/docker-php-fpm)
+
+## Documentation
+
+In case you seek help, go and visit the community pages.
+
+<table width="100%" style="width:100%; display:table;">
+ <thead>
+  <tr>
+   <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://devilbox.readthedocs.io">Documentation</a></h3></th>
+   <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://gitter.im/devilbox/Lobby">Chat</a></h3></th>
+   <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://devilbox.discourse.group">Forum</a></h3></th>
+  </tr>
+ </thead>
+ <tbody style="vertical-align: middle; text-align: center;">
+  <tr>
+   <td>
+    <a target="_blank" href="https://devilbox.readthedocs.io">
+     <img title="Documentation" name="Documentation" src="https://raw.githubusercontent.com/cytopia/icons/master/400x400/readthedocs.png" />
+    </a>
+   </td>
+   <td>
+    <a target="_blank" href="https://gitter.im/devilbox/Lobby">
+     <img title="Chat on Gitter" name="Chat on Gitter" src="https://raw.githubusercontent.com/cytopia/icons/master/400x400/gitter.png" />
+    </a>
+   </td>
+   <td>
+    <a target="_blank" href="https://devilbox.discourse.group">
+     <img title="Devilbox Forums" name="Forum" src="https://raw.githubusercontent.com/cytopia/icons/master/400x400/discourse.png" />
+    </a>
+   </td>
+  </tr>
+  <tr>
+  <td><a target="_blank" href="https://devilbox.readthedocs.io">devilbox.readthedocs.io</a></td>
+  <td><a target="_blank" href="https://gitter.im/devilbox/Lobby">gitter.im/devilbox</a></td>
+  <td><a target="_blank" href="https://devilbox.discourse.group">devilbox.discourse.group</a></td>
+  </tr>
+ </tbody>
+</table>
 
 ## Build
 
@@ -27,7 +71,7 @@ This repository will provide you a fully functional PHP-FPM 8.0 Docker image bui
 # Build the Docker image locally
 make build
 
-# Rebuild (without cache) the Docker image locally
+# Rebuild the Docker image locally without cache
 make rebuild
 
 # Test the Docker image after building
