@@ -5,6 +5,12 @@ TAG = latest
 
 .PHONY: build rebuild test tag pull login push enter
 
+update-readme:
+	cat "./README.md" \
+		| perl -00 -pe "s/<!-- modules -->.*<!-- \/modules -->/<!-- modules -->\n$$(./tests/get-modules.sh)\n<!-- \/modules -->/s" \
+		> "./README.md.tmp"
+	yes | mv -f "./README.md.tmp" "./README.md"
+
 build:
 	docker build -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
 
