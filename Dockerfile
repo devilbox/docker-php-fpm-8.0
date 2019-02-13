@@ -117,6 +117,7 @@ RUN set -eux; \
 		bison \
 		libcurl4-openssl-dev \
 		libedit-dev \
+		libonig-dev \
 		libsodium-dev \
 		libsqlite3-dev \
 		libssl-dev \
