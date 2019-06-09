@@ -117,6 +117,7 @@ RUN set -eux; \
 		bison \
 		libcurl4-openssl-dev \
 		libedit-dev \
+		libffi-dev \
 		libonig-dev \
 		libsodium-dev \
 		libsqlite3-dev \
@@ -179,6 +180,8 @@ RUN set -eux; \
         # TODO: The above resulted in: undefined symbol: sodium_init
 		# https://github.com/docker-library/php/blob/master/7.3/stretch/fpm/Dockerfile#L173
 		--with-sodium \
+		# Build FFI into it
+		--with-ffi \
 		\
 		--with-curl \
 		--with-libedit \
@@ -212,7 +215,9 @@ RUN set -eux; \
 		| sort -u \
 		| xargs -r apt-mark manual \
 	; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false bison; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+		bison \
+		libffi-dev; \
 	\
 	php --version;
 #	\

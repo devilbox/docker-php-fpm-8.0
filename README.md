@@ -99,6 +99,7 @@ modules enabled by default visit: **[devilbox/docker-php-fpm](https://github.com
 | curl         | ✔         |
 | date         | ✔         |
 | dom          | ✔         |
+| FFI          | ✔         |
 | fileinfo     | ✔         |
 | filter       | ✔         |
 | ftp          | ✔         |
