@@ -81,6 +81,7 @@ RUN set -xe; \
 #	wget -O php.tar.xz "$PHP_URL"; \
 	git clone http://git.php.net/repository/php-src.git php; \
 	cd php; \
+	git checkout PHP-8.0; \
 	./buildconf --force; \
 	rm -rf .git; \
 	cd /usr/src; \
