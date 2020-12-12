@@ -1,7 +1,9 @@
 # PHP-FPM 8.0
 
+[![lint](https://github.com/devilbox/docker-php-fpm-8.0/workflows/lint/badge.svg)](https://github.com/devilbox/docker-php-fpm-8.0/actions?query=workflow%3Alint)
 [![build](https://github.com/devilbox/docker-php-fpm-8.0/workflows/build/badge.svg)](https://github.com/devilbox/docker-php-fpm-8.0/actions?query=workflow%3Abuild)
 [![nightly](https://github.com/devilbox/docker-php-fpm-8.0/workflows/nightly/badge.svg)](https://github.com/devilbox/docker-php-fpm-8.0/actions?query=workflow%3Anightly)
+
 [![Tag](https://img.shields.io/github/tag/devilbox/docker-php-fpm-8.0.svg)](https://github.com/devilbox/docker-php-fpm-8.0/releases)
 [![Gitter](https://badges.gitter.im/devilbox/Lobby.svg)](https://gitter.im/devilbox/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Discourse](https://img.shields.io/discourse/https/devilbox.discourse.group/status.svg?colorB=%234CB697)](https://devilbox.discourse.group)
