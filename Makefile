@@ -37,16 +37,16 @@ help:
 lint: lint-workflow
 
 lint-workflow:
-	@GIT_BRANCH="$$( git branch | grep '^*' | awk -F' ' '{print $$2}' )"; \
-	if echo "$${GIT_BRANCH}" | grep -E '^release-[.0-9]+$$' >/dev/null; then \
-		GIT_TAG="$$( echo "$${GIT_BRANCH}" | sed 's/^release-//g' )"; \
+	@\
+	GIT_CURR_MAJOR="$$( git tag | sort -V | tail -1 | sed 's|\.[0-9]*$$||g' )"; \
+	GIT_CURR_MINOR="$$( git tag | sort -V | tail -1 | sed 's|^[0-9]*\.||g' )"; \
+	GIT_NEXT_TAG="$${GIT_CURR_MAJOR}.$$(( GIT_CURR_MINOR + 1 ))"; \
 		if ! grep 'refs:' -A 100 .github/workflows/nightly.yml \
-			| grep  "          - '$${GIT_TAG}'" >/dev/null; then \
-			echo "[ERR] New Tag required in .github/workflows/nightly.yml: $${GIT_TAG}"; \
+		| grep  "          - '$${GIT_NEXT_TAG}'" >/dev/null; then \
+		echo "[ERR] New Tag required in .github/workflows/nightly.yml: $${GIT_NEXT_TAG}"; \
 			exit 1; \
 		else \
-			echo "[OK] Git Tag present in .github/workflows/nightly.yml: $${GIT_TAG}"; \
-		fi \
+		echo "[OK] Git Tag present in .github/workflows/nightly.yml: $${GIT_NEXT_TAG}"; \
 	fi
 
 
