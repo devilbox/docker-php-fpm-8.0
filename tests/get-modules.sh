@@ -6,7 +6,7 @@ set -o pipefail
 
 MODULES="$( docker run --rm -t --entrypoint=php  devilbox/php-fpm-8.0 -m \
 	| grep -vE '(^\[)|(^\s*$)' \
-	| sort -u
+	| sort -u -f
 )"
 
 echo "| Module       | Built-in  |"
