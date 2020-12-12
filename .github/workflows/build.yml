@@ -1,0 +1,188 @@
+---
+
+# -------------------------------------------------------------------------------------------------
+# Job Name
+# -------------------------------------------------------------------------------------------------
+name: build
+
+
+# -------------------------------------------------------------------------------------------------
+# When to run
+# -------------------------------------------------------------------------------------------------
+on:
+  # Runs on Pull Requests
+  pull_request:
+  # Runs on Push
+  push:
+
+
+# -------------------------------------------------------------------------------------------------
+# What to run
+# -------------------------------------------------------------------------------------------------
+jobs:
+  build:
+    name: "[ PHP-${{ matrix.version }} ]"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: False
+      matrix:
+        version:
+          - '8.0'
+    steps:
+
+      # ------------------------------------------------------------
+      # Setup repository
+      # ------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set variables
+        id: vars
+        run: |
+
+          # Retrieve git info (tags, etc)
+          git fetch --all
+
+          # Branch, Tag or Commit
+          GIT_TYPE="$( \
+            curl -sS https://raw.githubusercontent.com/cytopia/git-tools/master/git-info.sh \
+            | sh \
+            | grep '^GIT_TYPE' \
+            | sed 's|.*=||g' \
+          )"
+          # Branch name, Tag name or Commit Hash
+          GIT_SLUG="$( \
+            curl -sS https://raw.githubusercontent.com/cytopia/git-tools/master/git-info.sh \
+            | sh \
+            | grep '^GIT_NAME' \
+            | sed 's|.*=||g' \
+          )"
+          # Docker Tag
+          if [ "${GIT_TYPE}" = "BRANCH" ] && [ "${GIT_SLUG}" = "master" ]; then
+            DOCKER_TAG="latest"
+          else
+            DOCKER_TAG="${GIT_SLUG}"
+          fi
+
+          # Output
+          echo "GIT_TYPE=${GIT_TYPE}"
+          echo "GIT_SLUG=${GIT_SLUG}"
+          echo "DOCKER_TAG=${DOCKER_TAG}"
+
+          # Export variable
+          # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#environment-files
+          echo "GIT_TYPE=${GIT_TYPE}"     >> ${GITHUB_ENV}
+          echo "GIT_SLUG=${GIT_SLUG}"     >> ${GITHUB_ENV}
+          echo "DOCKER_TAG=${DOCKER_TAG}" >> ${GITHUB_ENV}
+
+
+      # ------------------------------------------------------------
+      # Build
+      # ------------------------------------------------------------
+      - name: Build
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build
+        env:
+          RETRIES: 20
+          PAUSE: 10
+
+      # ------------------------------------------------------------
+      # Test
+      # ------------------------------------------------------------
+      - name: Test Docker Image
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test
+        env:
+          RETRIES: 20
+          PAUSE: 10
+
+      - name: Test Repository Readme
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make update-readme
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
+        env:
+          RETRIES: 20
+          PAUSE: 10
+
+
+      # ------------------------------------------------------------
+      # Deploy
+      # ------------------------------------------------------------
+      - name: Publish images (only repo owner)
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep ${PAUSE};
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+
+          # Output
+          echo "GIT_TYPE=${GIT_TYPE}"
+          echo "GIT_SLUG=${GIT_SLUG}"
+          echo "DOCKER_TAG=${DOCKER_TAG}"
+
+          # Tag image
+          retry make tag TAG=${DOCKER_TAG}
+          docker images
+
+          # Login and Push
+          retry make login USER=${{ secrets.DOCKERHUB_USERNAME }} PASS=${{ secrets.DOCKERHUB_PASSWORD }}
+          retry make push TAG=${DOCKER_TAG}
+
+        env:
+          RETRIES: 20
+          PAUSE: 10
+        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+            && (
+              (github.event_name == 'schedule' && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && startsWith(github.ref, 'refs/heads/release-'))
+            )
