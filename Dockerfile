@@ -92,7 +92,7 @@ RUN set -eux; \
 	#	gpgconf --kill all; \
 	#	rm -rf "$GNUPGHOME"; \
 	#fi; \
-	git clone http://git.php.net/repository/php-src.git php; \
+	git clone https://github.com/php/php-src php; \
 	cd php; \
 	git checkout "$( \
 		git for-each-ref --format='%(refname)' refs/tags \
