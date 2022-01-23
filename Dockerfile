@@ -96,7 +96,7 @@ RUN set -eux; \
 	cd php; \
 	git checkout "$( \
 		git for-each-ref --format='%(refname)' refs/tags \
-		| grep -E 'refs/tags/php-8[.0-9]+$' \
+		| grep -E 'refs/tags/php-8\.0[.0-9]+$' \
 		| sed 's|.*tags/||g' \
 		| sort -V \
 		| tail -1 \
