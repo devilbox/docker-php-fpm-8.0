@@ -10,21 +10,118 @@ name: build
 # When to run
 # -------------------------------------------------------------------------------------------------
 on:
-  # Runs on Pull Requests
-  pull_request:
   # Runs on Push
   push:
 
 
-# -------------------------------------------------------------------------------------------------
-# What to run
-# -------------------------------------------------------------------------------------------------
 jobs:
+
+  # -----------------------------------------------------------------------------------------------
+  # Job (1/2): BUILD
+  # -----------------------------------------------------------------------------------------------
   build:
-    name: "[ PHP-${{ matrix.version }} ]"
+    name: "[ PHP-${{ matrix.version }} (${{ matrix.arch }}) ]"
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: False
+      fail-fast: false
+      matrix:
+        version:
+          - '8.0'
+        arch:
+          - 'linux/amd64'
+          - 'linux/arm64'
+          - 'linux/386'
+          - 'linux/arm/v7'
+          - 'linux/arm/v6'
+    steps:
+
+      # ------------------------------------------------------------
+      # Setup repository
+      # ------------------------------------------------------------
+      - name: "[SETUP] Checkout repository"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "[SETUP] Setup QEMU environment"
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: "[SETUP] Determine Docker tag"
+        id: tag
+        uses: cytopia/docker-tag@v0.3
+
+      # ------------------------------------------------------------
+      # Build
+      # ------------------------------------------------------------
+      - name: Build
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make build ARCH=${ARCH}
+        env:
+          ARCH: ${{ matrix.arch }}
+
+      # ------------------------------------------------------------
+      # Test
+      # ------------------------------------------------------------
+      - name: "[TEST] Docker Image"
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make test ARCH=${ARCH}
+        env:
+          ARCH: ${{ matrix.arch }}
+
+      - name: "[TEST] Update README"
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make update-readme ARCH=${ARCH}
+        env:
+          ARCH: ${{ matrix.arch }}
+
+      - name: "[TEST] Verify README"
+        run: |
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
+
+      # ------------------------------------------------------------
+      # Deploy
+      # ------------------------------------------------------------
+      - name: "[DEPLOY] Login"
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: "[DEPLOY] Publish architecture image (only repo owner)"
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make push-arch TAG=${{ steps.tag.outputs.docker-tag }} ARCH=${ARCH}
+        env:
+          ARCH: ${{ matrix.arch }}
+        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+            && (
+              (github.event_name == 'schedule' && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && startsWith(github.ref, 'refs/heads/release-'))
+            )
+
+  # -----------------------------------------------------------------------------------------------
+  # Job (2/2): DEPLOY
+  # -----------------------------------------------------------------------------------------------
+  deploy:
+    needs: [build]
+    name: Deploy
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
       matrix:
         version:
           - '8.0'
@@ -33,150 +130,35 @@ jobs:
       # ------------------------------------------------------------
       # Setup repository
       # ------------------------------------------------------------
-      - name: Checkout repository
+      - name: "[SETUP] Checkout repository"
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Set variables
-        id: vars
-        run: |
-
-          # Retrieve git info (tags, etc)
-          git fetch --all
-
-          # Branch, Tag or Commit
-          GIT_TYPE="$( \
-            curl -sS https://raw.githubusercontent.com/cytopia/git-tools/master/git-info.sh \
-            | sh \
-            | grep '^GIT_TYPE' \
-            | sed 's|.*=||g' \
-          )"
-          # Branch name, Tag name or Commit Hash
-          GIT_SLUG="$( \
-            curl -sS https://raw.githubusercontent.com/cytopia/git-tools/master/git-info.sh \
-            | sh \
-            | grep '^GIT_NAME' \
-            | sed 's|.*=||g' \
-          )"
-          # Docker Tag
-          if [ "${GIT_TYPE}" = "BRANCH" ] && [ "${GIT_SLUG}" = "master" ]; then
-            DOCKER_TAG="latest"
-          else
-            DOCKER_TAG="${GIT_SLUG}"
-          fi
-
-          # Output
-          echo "GIT_TYPE=${GIT_TYPE}"
-          echo "GIT_SLUG=${GIT_SLUG}"
-          echo "DOCKER_TAG=${DOCKER_TAG}"
-
-          # Export variable
-          # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#environment-files
-          echo "GIT_TYPE=${GIT_TYPE}"     >> ${GITHUB_ENV}
-          echo "GIT_SLUG=${GIT_SLUG}"     >> ${GITHUB_ENV}
-          echo "DOCKER_TAG=${DOCKER_TAG}" >> ${GITHUB_ENV}
-
-
-      # ------------------------------------------------------------
-      # Build
-      # ------------------------------------------------------------
-      - name: Build
-        run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make build
-        env:
-          RETRIES: 20
-          PAUSE: 10
-
-      # ------------------------------------------------------------
-      # Test
-      # ------------------------------------------------------------
-      - name: Test Docker Image
-        run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make test
-        env:
-          RETRIES: 20
-          PAUSE: 10
-
-      - name: Test Repository Readme
-        run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
-          retry make update-readme
-          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
-        env:
-          RETRIES: 20
-          PAUSE: 10
-
+      - name: "[SETUP] Determine Docker tag"
+        id: tag
+        uses: cytopia/docker-tag@v0.3
 
       # ------------------------------------------------------------
       # Deploy
       # ------------------------------------------------------------
-      - name: Publish images (only repo owner)
-        run: |
-          retry() {
-            for n in $(seq ${RETRIES}); do
-              echo "[${n}/${RETRIES}] ${*}";
-              if eval "${*}"; then
-                echo "[SUCC] ${n}/${RETRIES}";
-                return 0;
-              fi;
-              sleep ${PAUSE};
-              echo "[FAIL] ${n}/${RETRIES}";
-            done;
-            return 1;
-          }
+      - name: "[DEPLOY] Login"
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-          # Output
-          echo "GIT_TYPE=${GIT_TYPE}"
-          echo "GIT_SLUG=${GIT_SLUG}"
-          echo "DOCKER_TAG=${DOCKER_TAG}"
+      - name: "[DEPLOY] Create Docker manifest"
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make manifest-create TAG=${{ steps.tag.outputs.docker-tag }} ARCH="linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6"
 
-          # Tag image
-          retry make tag TAG=${DOCKER_TAG}
-          docker images
-
-          # Login and Push
-          retry make login USER=${{ secrets.DOCKERHUB_USERNAME }} PASS=${{ secrets.DOCKERHUB_PASSWORD }}
-          retry make push TAG=${DOCKER_TAG}
-
-        env:
-          RETRIES: 20
-          PAUSE: 10
+      - name: "[DEPLOY] Publish Docker manifest (only repo owner)"
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make manifest-push TAG=${{ steps.tag.outputs.docker-tag }}
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (
