@@ -1,0 +1,90 @@
+---
+
+# -------------------------------------------------------------------------------------------------
+# Job Name
+# -------------------------------------------------------------------------------------------------
+name: build
+
+
+# -------------------------------------------------------------------------------------------------
+# When to run
+# -------------------------------------------------------------------------------------------------
+on:
+  # Runs on Pull Requests
+  pull_request:
+
+
+jobs:
+
+  # -----------------------------------------------------------------------------------------------
+  # Job (1/2): BUILD
+  # -----------------------------------------------------------------------------------------------
+  build:
+    name: "[ PHP-${{ matrix.version }} (${{ matrix.arch }}) ]"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - '8.0'
+        arch:
+          - 'linux/amd64'
+          - 'linux/arm64'
+          - 'linux/386'
+          - 'linux/arm/v7'
+          - 'linux/arm/v6'
+    # Only run for forks (contributor)
+    if: ${{ github.event.pull_request.head.repo.fork }}
+    steps:
+
+      # ------------------------------------------------------------
+      # Setup repository
+      # ------------------------------------------------------------
+      - name: "[SETUP] Checkout repository"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "[SETUP] Setup QEMU environment"
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: "[SETUP] Determine Docker tag"
+        id: tag
+        uses: cytopia/docker-tag@v0.3
+
+      # ------------------------------------------------------------
+      # Build
+      # ------------------------------------------------------------
+      - name: Build
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make build ARCH=${ARCH}
+        env:
+          ARCH: ${{ matrix.arch }}
+
+      # ------------------------------------------------------------
+      # Test
+      # ------------------------------------------------------------
+      - name: "[TEST] Docker Image"
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make test ARCH=${ARCH}
+        env:
+          ARCH: ${{ matrix.arch }}
+
+      - name: "[TEST] Update README"
+        uses: cytopia/shell-command-retry-action@v0.1
+        with:
+          command: |
+            make update-readme ARCH=${ARCH}
+        env:
+          ARCH: ${{ matrix.arch }}
+
+      - name: "[TEST] Verify README"
+        run: |
+          git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
