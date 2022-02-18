@@ -21,6 +21,7 @@ jobs:
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
     steps:
       # ------------------------------------------------------------
       # Setup repository
@@ -30,10 +31,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Output info
+        run: |
+          echo "${{ github.actor }}"
+
       # ------------------------------------------------------------
       # Lint repository
       # ------------------------------------------------------------
       - name: Lint workflow
-        id: vars
         run: |
           make lint-workflow
