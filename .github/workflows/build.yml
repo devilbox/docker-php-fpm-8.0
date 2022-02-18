@@ -13,28 +13,60 @@ on:
   # Runs on Push
   push:
 
+env:
+  MATRIX_VERSION: '["8.0"]'
+  MATRIX_ARCH: '["linux/amd64","linux/386","linux/arm64","linux/arm/v7","linux/arm/v6"]'
+
 
 jobs:
 
   # -----------------------------------------------------------------------------------------------
-  # Job (1/2): BUILD
+  # Job (1/3): Configure Pipeline
+  # -----------------------------------------------------------------------------------------------
+  configure:
+    name: Configure
+    runs-on: ubuntu-latest
+    outputs:
+      matrix_version: ${{ steps.set-matrix-version.outputs.matrix_version }}
+      matrix_arch: ${{ steps.set-matrix-arch.outputs.matrix_arch }}
+      manifest_arch: ${{ steps.set-manifest-arch.outputs.manifest }}
+    steps:
+
+      - name: "[OUTPUT] Export Matrix 'Version'"
+        id: set-matrix-version
+        run: |
+          echo '::set-output name=matrix_version::${{ env.MATRIX_VERSION }}'
+          echo "${{ env.MATRIX_VERSION }}"
+
+      - name: "[OUTPUT] Export Matrix 'Arch'"
+        id: set-matrix-arch
+        run: |
+          echo '::set-output name=matrix_arch::${{ env.MATRIX_ARCH }}'
+          echo "${{ env.MATRIX_ARCH }}"
+
+      - name: "[OUTPUT] Export Manifest 'Arch'"
+        id: set-manifest-arch
+        run: |
+          ARCH="$( echo ${{ env.MATRIX_ARCH }} | sed 's/"//g' | sed 's/\[//g' | sed 's/\]//g' | sed 's/ //g' )"
+          echo "::set-output name=manifest::${ARCH}"
+          echo "${ARCH}"
+
+
+  # -----------------------------------------------------------------------------------------------
+  # Job (2/3): BUILD
   # -----------------------------------------------------------------------------------------------
   build:
-    name: "[ PHP-${{ matrix.version }} (${{ matrix.arch }}) ]"
+    needs: configure
+    name: Build PHP-${{ matrix.version }} (${{ matrix.arch }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         version:
-          - '8.0'
+          - ${{ fromJson(needs.configure.outputs.matrix_version) }}
         arch:
-          - 'linux/amd64'
-          - 'linux/arm64'
-          - 'linux/386'
-          - 'linux/arm/v7'
-          - 'linux/arm/v6'
+          - ${{ fromJson(needs.configure.outputs.matrix_arch) }}
     steps:
-
       # ------------------------------------------------------------
       # Setup repository
       # ------------------------------------------------------------
@@ -51,37 +83,31 @@ jobs:
 
       - name: "[SETUP] Determine Docker tag"
         id: tag
-        uses: cytopia/docker-tag@v0.4.7
+        uses: cytopia/docker-tag-action@v0.4.7
 
       # ------------------------------------------------------------
       # Build
       # ------------------------------------------------------------
       - name: Build
-        uses: cytopia/shell-command-retry-action@v0.1
+        uses: cytopia/shell-command-retry-action@v0.1.2
         with:
           command: |
-            make build ARCH=${ARCH}
-        env:
-          ARCH: ${{ matrix.arch }}
+            make build ARCH=${{ matrix.arch }}
 
       # ------------------------------------------------------------
       # Test
       # ------------------------------------------------------------
       - name: "[TEST] Docker Image"
-        uses: cytopia/shell-command-retry-action@v0.1
+        uses: cytopia/shell-command-retry-action@v0.1.2
         with:
           command: |
-            make test ARCH=${ARCH}
-        env:
-          ARCH: ${{ matrix.arch }}
+            make test ARCH=${{ matrix.arch }}
 
       - name: "[TEST] Update README"
-        uses: cytopia/shell-command-retry-action@v0.1
+        uses: cytopia/shell-command-retry-action@v0.1.2
         with:
           command: |
-            make update-readme ARCH=${ARCH}
-        env:
-          ARCH: ${{ matrix.arch }}
+            make update-readme ARCH=${{ matrix.arch }}
 
       - name: "[TEST] Verify README"
         run: |
@@ -90,19 +116,26 @@ jobs:
       # ------------------------------------------------------------
       # Deploy
       # ------------------------------------------------------------
-      - name: "[DEPLOY] Login"
+      - name: "[DEPLOY] Login (only repo owner)"
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+            && (
+              (github.event_name == 'schedule' && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && startsWith(github.ref, 'refs/heads/release-'))
+            )
 
       - name: "[DEPLOY] Publish architecture image (only repo owner)"
-        uses: cytopia/shell-command-retry-action@v0.1
+        uses: cytopia/shell-command-retry-action@v0.1.2
         with:
           command: |
-            make push-arch TAG=${{ steps.tag.outputs.docker-tag }} ARCH=${ARCH}
-        env:
-          ARCH: ${{ matrix.arch }}
+            make push-arch TAG=${{ steps.tag.outputs.docker-tag }} ARCH=${{ matrix.arch }}
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (
@@ -114,19 +147,27 @@ jobs:
             )
 
   # -----------------------------------------------------------------------------------------------
-  # Job (2/2): DEPLOY
+  # Job (3/3): DEPLOY
   # -----------------------------------------------------------------------------------------------
   deploy:
-    needs: [build]
+    needs: [configure, build]
     name: Deploy
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         version:
-          - '8.0'
+          - ${{ fromJson(needs.configure.outputs.matrix_version) }}
+    # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+    if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+        && (
+          (github.event_name == 'schedule' && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+          ||
+          (github.event_name == 'push'     && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
+          ||
+          (github.event_name == 'push'     && startsWith(github.ref, 'refs/heads/release-'))
+        )
     steps:
-
       # ------------------------------------------------------------
       # Setup repository
       # ------------------------------------------------------------
@@ -137,7 +178,7 @@ jobs:
 
       - name: "[SETUP] Determine Docker tag"
         id: tag
-        uses: cytopia/docker-tag@v0.4.7
+        uses: cytopia/docker-tag-action@v0.4.7
 
       # ------------------------------------------------------------
       # Deploy
@@ -149,22 +190,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: "[DEPLOY] Create Docker manifest"
-        uses: cytopia/shell-command-retry-action@v0.1
+        uses: cytopia/shell-command-retry-action@v0.1.2
         with:
           command: |
-            make manifest-create TAG=${{ steps.tag.outputs.docker-tag }} ARCH="linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6"
+            make manifest-create TAG=${{ steps.tag.outputs.docker-tag }} ARCH="${{ needs.configure.outputs.manifest_arch }}"
 
-      - name: "[DEPLOY] Publish Docker manifest (only repo owner)"
-        uses: cytopia/shell-command-retry-action@v0.1
+      - name: "[DEPLOY] Publish Docker manifest"
+        uses: cytopia/shell-command-retry-action@v0.1.2
         with:
           command: |
             make manifest-push TAG=${{ steps.tag.outputs.docker-tag }}
-        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
-        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
-            && (
-              (github.event_name == 'schedule' && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
-              ||
-              (github.event_name == 'push'     && (github.ref == 'refs/heads/master'   || startsWith(github.ref, 'refs/tags/')))
-              ||
-              (github.event_name == 'push'     && startsWith(github.ref, 'refs/heads/release-'))
-            )
