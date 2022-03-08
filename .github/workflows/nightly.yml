@@ -88,7 +88,7 @@ jobs:
 
       - name: "[SETUP] Determine Docker tag"
         id: tag
-        uses: cytopia/docker-tag-action@v0.4.7
+        uses: cytopia/docker-tag-action@v0.4.15
 
       # ------------------------------------------------------------
       # Build
@@ -160,7 +160,7 @@ jobs:
 
       - name: "[SETUP] Determine Docker tag"
         id: tag
-        uses: cytopia/docker-tag-action@v0.4.7
+        uses: cytopia/docker-tag-action@v0.4.15
 
       # ------------------------------------------------------------
       # Deploy
