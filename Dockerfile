@@ -233,6 +233,7 @@ RUN docker-php-ext-enable sodium
 
 ENTRYPOINT ["docker-php-entrypoint"]
 WORKDIR /var/www/html
+COPY data/php.ini /usr/local/etc/php/php.ini
 
 RUN set -eux; \
 	cd /usr/local/etc; \

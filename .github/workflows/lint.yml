@@ -19,25 +19,4 @@ on:
 # -------------------------------------------------------------------------------------------------
 jobs:
   lint:
-    name: "Lint"
-    runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
-    steps:
-      # ------------------------------------------------------------
-      # Setup repository
-      # ------------------------------------------------------------
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Output info
-        run: |
-          echo "${{ github.actor }}"
-
-      # ------------------------------------------------------------
-      # Lint repository
-      # ------------------------------------------------------------
-      - name: Lint workflow
-        run: |
-          make lint-workflow
+    uses: devilbox/github-actions/.github/workflows/lint-generic.yml@master
