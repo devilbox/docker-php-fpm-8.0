@@ -49,7 +49,7 @@ jobs:
 
       - name: "[Set-Output] Matrix 'Refs' (master branch and latest tag)"
         id: set-refs
-        uses: cytopia/git-ref-matrix-action@v0.1.4
+        uses: cytopia/git-ref-matrix-action@v0.1.7
         with:
           repository_default_branch: master
           branches: master
