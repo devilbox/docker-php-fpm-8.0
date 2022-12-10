@@ -53,7 +53,7 @@ jobs:
         with:
           repository_default_branch: master
           branches: master
-          num_latest_tags: 1
+          num_latest_tags: 0
         if: github.event_name == 'schedule'
 
       - name: "[DEBUG] Show settings'"

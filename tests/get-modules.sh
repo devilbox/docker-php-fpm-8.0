@@ -16,9 +16,26 @@ MODULES="$( docker run --rm -t --platform "${ARCH}" --entrypoint=php "${IMAGE}:$
 	| sort -u -f
 )"
 
-echo "| Module       | Built-in  |"
-echo "|--------------|-----------|"
+echo "| Extension                      | Built-in  |"
+echo "|--------------------------------|-----------|"
 echo "${MODULES}" | while read -r line; do
-	line="$( echo "${line}" | sed 's/\r//g' | xargs )"
-	printf "| %-12s | ✔         |\n" "${line}"
+	name="$( printf "%s" "${line}" )"
+	nick="$( echo "${name}" | awk '{print tolower($0)}' | sed 's/\r//g' | xargs )"
+	link="$( echo "[${name}][lnk_${nick}]" | sed 's/\r//g' | xargs )"
+	if [ "${nick}" = "core" ] || [ "${nick}" = "standard" ]; then
+		continue
+	fi
+	printf "| %-30s | ✓         |\n" "${link}"
+done
+echo
+
+echo "${MODULES}" | while read -r line; do
+	name="$( printf "%s" "${line}" )"
+	nick="$( echo "${name}" | awk '{print tolower($0)}' | sed 's/\r//g' | xargs )"
+	link="$( printf "%s" "[lnk_${nick}]" | sed 's/\r//g' | xargs )"
+	addr="$( printf "%s: %s" "${link}" "https://github.com/devilbox/docker-php-fpm/tree/master/php_modules/${nick}" | sed 's/\r//g' | xargs )"
+	if [ "${nick}" = "core" ] || [ "${nick}" = "standard" ]; then
+		continue
+	fi
+	printf "%s\n" "${addr}"
 done
