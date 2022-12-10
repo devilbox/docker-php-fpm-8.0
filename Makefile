@@ -27,13 +27,13 @@ TAG        = latest
 NAME       = PHP
 VERSION    = 8.0
 IMAGE      = devilbox/php-fpm-$(VERSION)
-DIR        = .
+DIR        = Dockerfiles
 FILE       = Dockerfile
 DOCKER_TAG = $(TAG)
 ARCH       = linux/amd64
 
 # Makefile.lint overwrites
-FL_IGNORES  = .git/,.github/,tests/,data/
+FL_IGNORES  = .git/,.github/,tests/,Dockerfiles/data/
 SC_IGNORES  = .git/,.github/,tests/
 
 
@@ -92,7 +92,7 @@ _test-integration:
 .PHONY: update-readme
 update-readme:
 	cat "./README.md" \
-		| perl -0 -pe "s/<!-- modules -->.*<!-- \/modules -->/<!-- modules -->\n$$(./tests/get-modules.sh $(IMAGE) $(NAME) $(VERSION) $(DOCKER_TAG) $(ARCH))\n<!-- \/modules -->/s" \
+		| perl -0 -pe "s#<!-- modules -->.*<!-- \/modules -->#<!-- modules -->\n$$(./tests/get-modules.sh $(IMAGE) $(NAME) $(VERSION) $(DOCKER_TAG) $(ARCH))\n<!-- \/modules -->#s" \
 		> "./README.md.tmp"
 	yes | mv -f "./README.md.tmp" "./README.md"
 	git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
