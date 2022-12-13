@@ -7,8 +7,8 @@
 [![nightly](https://github.com/devilbox/docker-php-fpm-8.0/workflows/nightly/badge.svg)](https://github.com/devilbox/docker-php-fpm-8.0/actions?query=workflow%3Anightly)
 [![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
-[![Gitter](https://badges.gitter.im/devilbox/Lobby.svg)](https://gitter.im/devilbox/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Discourse](https://img.shields.io/discourse/https/devilbox.discourse.group/status.svg?colorB=%234CB697)](https://devilbox.discourse.group)
+[![Discord](https://img.shields.io/discord/1051541389256704091?color=8c9eff&label=Discord&logo=discord)](https://discord.gg/2wP3V6kBj4)
+[![Discourse](https://img.shields.io/discourse/https/devilbox.discourse.group/status.svg?colorB=%234CB697&label=Discourse&logo=discourse)](https://devilbox.discourse.group)
 
 **Available Architectures:**  `amd64`, `i386`, `arm64`, `arm/v7`, `arm/v6`
 
@@ -216,7 +216,7 @@ Open up your browser at http://127.0.0.1:8080
 Have a look at the following similar Devilbox base images for which no official versions exist yet:
 
 * **[`PHP-FPM 5.2`](https://github.com/devilbox/docker-php-fpm-5.2)** **[`PHP-FPM 5.3`](https://github.com/devilbox/docker-php-fpm-5.3)** **[`PHP-FPM 5.4`](https://github.com/devilbox/docker-php-fpm-5.4)** **[`PHP-FPM 5.5`](https://github.com/devilbox/docker-php-fpm-5.5)**
-* **[`PHP-FPM 8.0`](https://github.com/devilbox/docker-php-fpm-8.0)** **[`PHP-FPM 8.1`](https://github.com/devilbox/docker-php-fpm-8.1)** **[`PHP-FPM 8.2`](https://github.com/devilbox/docker-php-fpm-8.2)** **[`PHP-FPM 8.3`](https://github.com/devilbox/docker-php-fpm-8.2)**
+* **[`PHP-FPM 8.0`](https://github.com/devilbox/docker-php-fpm-8.0)** **[`PHP-FPM 8.1`](https://github.com/devilbox/docker-php-fpm-8.1)** **[`PHP-FPM 8.2`](https://github.com/devilbox/docker-php-fpm-8.2)** **[`PHP-FPM 8.3`](https://github.com/devilbox/docker-php-fpm-8.3)**
 
 In case you are looking for development and production ready PHP-FPM images for all versions,
 which have a vast amount of modules enabled by default go here: **[PHP-FPM](https://github.com/devilbox/docker-php-fpm)**
@@ -280,8 +280,8 @@ In case you seek help, go and visit the community pages.
  <thead>
   <tr>
    <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://devilbox.readthedocs.io">📘	Documentation</a></h3></th>
-   <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://gitter.im/devilbox/Lobby">🗪 Chat</a></h3></th>
-   <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://devilbox.discourse.group">🗫 Forum</a></h3></th>
+   <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://discord.gg/2wP3V6kBj4">🎮 Discord</a></h3></th>
+   <th width="33%" style="width:33%;"><h3><a target="_blank" href="https://devilbox.discourse.group">🗪 Forum</a></h3></th>
   </tr>
  </thead>
  <tbody style="vertical-align: middle; text-align: center;">
@@ -292,8 +292,8 @@ In case you seek help, go and visit the community pages.
     </a>
    </td>
    <td>
-    <a target="_blank" href="https://gitter.im/devilbox/Lobby">
-     <img title="Chat on Gitter" name="Chat on Gitter" src="https://raw.githubusercontent.com/cytopia/icons/master/400x400/gitter.png" />
+    <a target="_blank" href="https://discord.gg/2wP3V6kBj4">
+     <img title="Chat on Discord" name="Chat on Discord" src="https://raw.githubusercontent.com/cytopia/icons/master/400x400/discord.png" />
     </a>
    </td>
    <td>
@@ -304,7 +304,7 @@ In case you seek help, go and visit the community pages.
   </tr>
   <tr>
   <td><a target="_blank" href="https://devilbox.readthedocs.io">devilbox.readthedocs.io</a></td>
-  <td><a target="_blank" href="https://gitter.im/devilbox/Lobby">gitter.im/devilbox</a></td>
+  <td><a target="_blank" href="https://discord.gg/2wP3V6kBj4">discord/devilbox</a></td>
   <td><a target="_blank" href="https://devilbox.discourse.group">devilbox.discourse.group</a></td>
   </tr>
  </tbody>
@@ -315,7 +315,7 @@ In case you seek help, go and visit the community pages.
 
 **[@cytopia](https://github.com/cytopia)**
 
-I try to keep with literally **over 100 projects** besides a full-time job.
+I try to keep up with literally **over 100 projects** besides a full-time job.
 If my work is making your life easier, consider contributing. 🖤
 
 * [GitHub Sponsorship](https://github.com/sponsors/cytopia)

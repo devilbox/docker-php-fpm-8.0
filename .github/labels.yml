@@ -10,3 +10,18 @@
 - name: PR-merge
   color: 3498db
   description: "Pull Request: Merge when ready"
+- name: bug
+  color: ee0701
+  description: "Bug Report"
+- name: triage
+  color: 0c9cf2
+  description: "Needs Triaging"
+- name: feature
+  color: dc8b10
+  description: "Feature Request"
+- name: invalid
+  color: e6e6e6
+  description: "Invalid Issue"
+- name: duplicate
+  color: 4e6ca2
+  description: "Duplicate Issue"
