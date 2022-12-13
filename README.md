@@ -7,8 +7,8 @@
 [![nightly](https://github.com/devilbox/docker-php-fpm-8.0/workflows/nightly/badge.svg)](https://github.com/devilbox/docker-php-fpm-8.0/actions?query=workflow%3Anightly)
 [![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
-[![Gitter](https://badges.gitter.im/devilbox/Lobby.svg)](https://gitter.im/devilbox/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Discourse](https://img.shields.io/discourse/https/devilbox.discourse.group/status.svg?colorB=%234CB697)](https://devilbox.discourse.group)
+[![Discord](https://img.shields.io/discord/1051541389256704091?color=8c9eff&label=Discord&logo=discord)](https://discord.gg/2wP3V6kBj4)
+[![Discourse](https://img.shields.io/discourse/https/devilbox.discourse.group/status.svg?colorB=%234CB697&label=Discourse&logo=discourse)](https://devilbox.discourse.group)
 
 **Available Architectures:**  `amd64`, `i386`, `arm64`, `arm/v7`, `arm/v6`
 
