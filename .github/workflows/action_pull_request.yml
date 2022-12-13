@@ -11,6 +11,13 @@ name: build
 # -------------------------------------------------------------------------------------------------
 on:
   pull_request:
+    paths:
+      - '.github/workflows/action_pull_request.yml'
+      - '.github/workflows/params.yml'
+      - 'Dockerfiles/**'
+      - 'tests/**'
+      - 'Makefile'
+      - '!**.md'
 
 
 jobs:
