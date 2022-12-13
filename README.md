@@ -315,7 +315,7 @@ In case you seek help, go and visit the community pages.
 
 **[@cytopia](https://github.com/cytopia)**
 
-I try to keep with literally **over 100 projects** besides a full-time job.
+I try to keep up with literally **over 100 projects** besides a full-time job.
 If my work is making your life easier, consider contributing. 🖤
 
 * [GitHub Sponsorship](https://github.com/sponsors/cytopia)
